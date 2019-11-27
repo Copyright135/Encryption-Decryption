@@ -6,19 +6,37 @@ public class Main {
 
     public static void main(String[] args) {
         //take in arguments, mode first, then the message, then the shift key
-        Scanner scan = new Scanner(System.in);
-        String mode = scan.nextLine();
-        String message = scan.nextLine();
-        int shift = scan.nextInt();
 
-        //check the mode for "enc" for encrypt or "dec" for decrypt, otherwise ask user to try again
+        Scanner scan = new Scanner(System.in);
+        String mode = "enc";
+        String message = "";
+        int shift = 0;
+
+        if(args.length > 0) { //check for arguments on command line
+            for(int i = 0; i < args.length; i += 2) {
+                if("-mode".equalsIgnoreCase(args[i])) {
+                    mode = args[i + 1];
+                } else if("-key".equalsIgnoreCase(args[i])) {
+                    shift = Integer.parseInt(args[i + 1]);
+                } else if("-data".equalsIgnoreCase(args[i])) {
+                    message = args[i + 1];
+                }
+            }
+        } else { //use System input if no arguments
+            mode = scan.nextLine();
+            message = scan.nextLine();
+            shift = scan.nextInt();
+        }
+
         if(mode.equals("enc")) {
-            encrypt(message, shift);
+               encrypt(message, shift);
         } else if (mode.equals("dec")) {
             decrypt(message, shift);
         } else {
             System.out.println("Please try again, and use \"enc\" for encrypt and \"dec\" for decrypt");
         }
+
+
     }
 
     //if mode is "enc", then the message and key will be sent to this method for encryption
