@@ -1,0 +1,26 @@
+package encryptdecrypt;
+
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        String message = scan.nextLine();
+        int shift = scan.nextInt();
+        String encodedMessage = "";
+
+        for(int i = 0; i < message.length(); i++) {
+            char ch = message.charAt(i);
+            if(ch >= 'a' && ch <= 'z') {
+                ch += shift;
+                if(ch > 'z') {
+                    ch = (char)('a' + (ch - 'z' - 1));
+                }
+                encodedMessage += ch;
+            } else {
+                encodedMessage += ch;
+            }
+        }
+        System.out.println(encodedMessage);
+    }
+}
