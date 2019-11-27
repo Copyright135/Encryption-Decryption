@@ -3,24 +3,55 @@ package encryptdecrypt;
 import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
+        //take in arguments, mode first, then the message, then the shift key
         Scanner scan = new Scanner(System.in);
+        String mode = scan.nextLine();
         String message = scan.nextLine();
         int shift = scan.nextInt();
+
+        //check the mode for "enc" for encrypt or "dec" for decrypt, otherwise ask user to try again
+        if(mode.equals("enc")) {
+            encrypt(message, shift);
+        } else if (mode.equals("dec")) {
+            decrypt(message, shift);
+        } else {
+            System.out.println("Please try again, and use \"enc\" for encrypt and \"dec\" for decrypt");
+        }
+    }
+
+    //if mode is "enc", then the message and key will be sent to this method for encryption
+    public static void encrypt(String message, int shift) {
         String encodedMessage = "";
+
+            for(int i = 0; i < message.length(); i++) {
+                char ch = message.charAt(i);
+                //if char is within this range, the letter will be encrypted
+                if(ch >= ' ' && ch <= '~') {
+                    ch = (char)(((ch - ' ' + shift) % 95) + ' ');
+                    encodedMessage += ch;
+                } else {
+                    encodedMessage += ch;
+                }
+            }
+        System.out.println(encodedMessage);
+    }
+
+    //if mode is "dec", then the message and key will be sent to this method for decryption        
+    public static void decrypt(String message, int shift) {
+        String decodedMessage = "";
 
         for(int i = 0; i < message.length(); i++) {
             char ch = message.charAt(i);
-            if(ch >= 'a' && ch <= 'z') {
-                ch += shift;
-                if(ch > 'z') {
-                    ch = (char)('a' + (ch - 'z' - 1));
-                }
-                encodedMessage += ch;
+            //if char is within this range, the letter will be decrypted
+            if(ch >= ' ' && ch <= '~') {
+                ch = (char) (((ch - ' ' - shift) % 95) + ' ');
+                decodedMessage += ch;
             } else {
-                encodedMessage += ch;
+                decodedMessage += ch;
             }
         }
-        System.out.println(encodedMessage);
+        System.out.println(decodedMessage);
     }
 }
