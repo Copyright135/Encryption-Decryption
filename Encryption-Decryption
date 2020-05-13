@@ -10,6 +10,7 @@ public class Main {
     public static void main(String[] args) {
 
         //declare the variables that we expect to use during the course of this program
+        String alg = "shift";
         String mode = "enc";
         String data = "";
         String inputPath = "";
@@ -19,13 +20,15 @@ public class Main {
         //check for arguments provided in the command line
         if(args.length > 0) {
             for(int i = 0; i < args.length; i += 2) {
-                if("-mode".equalsIgnoreCase(args[i])) {
+                if ("-alg".equals(args[i])) {
+                    alg = args[i + 1].toLowerCase();
+                } else if ("-mode".equalsIgnoreCase(args[i])) {
                     mode = args[i + 1].toLowerCase();
-                } else if("-key".equalsIgnoreCase(args[i])) {
+                } else if ("-key".equalsIgnoreCase(args[i])) {
                     key = Integer.parseInt(args[i + 1]);
                 } else if ("-data".equalsIgnoreCase(args[i])) {
                     data = args[i + 1];
-                } else if("-in".equalsIgnoreCase(args[i]) && "".equals(data)) {
+                } else if ("-in".equalsIgnoreCase(args[i]) && "".equals(data)) {
                     //will be ignored if "-data" arg is present, or overwritten if it comes later
                     inputPath = args[i + 1];
                 } else if ("-out".equalsIgnoreCase(args[i])) {
@@ -36,39 +39,34 @@ public class Main {
             }
         } else { //use System input if no arguments
             Scanner scan = new Scanner(System.in);
+            alg = scan.nextLine();
             mode = scan.nextLine();
             data = scan.nextLine();
             key = scan.nextInt();
             scan.close();
         }
 
-        //if an input is provided, retrieve the data from the file
+        //if a data file is provided, retrieve the data from the file
         if(!("".equals(inputPath))) {
             data = readDataFromFile(inputPath);
         }
 
-        //checks which mode the program is set to
-        if("enc".equals(mode)) {
-            String encryptedData = encrypt(data, key);
-            //outputs to a file depending if one is specified, otherwise prints in System output
-            if(!("".equals(outputPath))) {
-                writeDataToFile(encryptedData, outputPath);
-            } else {
-                System.out.println(encryptedData);
-            }
-        } else if ("dec".equals(mode)) {
-            String decryptedData = decrypt(data, key);
-            //outputs to a file depending if one is specified, otherwise prints in System output
-            if(!("".equals(outputPath))) {
-                writeDataToFile(decryptedData, outputPath);
-            } else {
-                System.out.println(decryptedData);
-            }
-        } else {
-            //in the case of the mode being set incorrectly, will alert user via system output
-            System.out.println("Please try again, and use \"enc\" for encrypt and \"dec\" for decrypt");
-        }
 
+        String configs[] = new String[] {alg, mode};
+
+        //create Encryption tool using provided configs
+        EncryptionTool encryptionTool = new EncryptionTool(configs, key);
+
+        //pass the data to the encryption tool for processing
+        String processedString = encryptionTool.process(data);
+
+
+        //After processing, the data will either be written to a specified file, or written to console in case of no file specified
+        if(!("".equals(outputPath))) {
+            writeDataToFile(processedString, outputPath);
+        } else {
+            System.out.println(processedString);
+        }
 
     }
 
@@ -92,44 +90,5 @@ public class Main {
         } catch (FileNotFoundException e) {
             System.out.println("File not found or inaccessible");
         }
-    }
-
-    //if mode is "enc", then the message and key will be sent to this method for encryption
-    private static String encrypt(String data, int key) {
-        String encryptedData = "";
-
-        //loops for every character in the String and changes the char
-        for(int i = 0; i < data.length(); i++) {
-            char ch = data.charAt(i);
-            //if char is within this range, it will be encrypted
-            if(ch >= ' ' && ch <= '~') {
-                ch = (char)(((ch - ' ' + key) % 95) + ' ');
-                encryptedData += ch;
-            } else {
-                //if the char is outside of the range, it will not be encrypted
-                encryptedData += ch;
-            }
-        }
-        return encryptedData;
-    }
-
-    //if mode is "dec", then the message and key will be sent to this method for decryption
-    private static String decrypt(String data, int key) {
-        String decryptedData = "";
-
-        //loops for each char and decrypts each one
-        for(int i = 0; i < data.length(); i++) {
-            char ch = data.charAt(i);
-            //if char is within this range, the letter will be decrypted
-            if(ch >= ' ' && ch <= '~') {
-                //if char is within this range, it will be decrypted
-                ch = (char) (((ch - ' ' - key) % 95) + ' ');
-                decryptedData += ch;
-            } else {
-                //if char is outside of the range, it will not be decrypted
-                decryptedData += ch;
-            }
-        }
-        return decryptedData;
     }
 }
